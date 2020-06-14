@@ -39,3 +39,14 @@ img.blur {
     filter:progid:DXImageTransform.Microsoft.Blur(PixelRadius='4');
     width:100%;
 }
+
+body, #map, html {
+    height: 100%;
+}
+
+@media (max-width: 768px) {
+    img.blur {
+        width: auto;
+        height: 100%;
+    }
+}
