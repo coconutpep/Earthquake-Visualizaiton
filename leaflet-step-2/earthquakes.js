@@ -42,7 +42,7 @@ function createCircleMarker(feature, latlng){
 
   // Create a GeoJSON layer containing the features array on the earthquakeData object
   // Run the onEachFeature function once for each piece of data in the array
-  var earthquakes = L.geoJSON(earthquakeData, {
+  const earthquakes = L.geoJSON(earthquakeData, {
     pointToLayer: createCircleMarker, // Call the function createCircleMarker to create the symbol for this layer,
     onEachFeature: onEachFeature
   });
@@ -61,14 +61,51 @@ function createMap(earthquakes) {
   accessToken: API_KEY
  });
 
+ const dark = L.tileLayer("https://api.mapbox.com/styles/v1/mapbox/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}", {
+  attribution: "Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"https://www.mapbox.com/\">Mapbox</a>",
+  maxZoom: 18,
+  id: "dark-v10",
+  accessToken: API_KEY
+});
+
+ const satellite = L.tileLayer("https://api.mapbox.com/styles/v1/mapbox/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}", {
+  attribution: "Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"https://www.mapbox.com/\">Mapbox</a>",
+  maxZoom: 18,
+  id: "satellite-v9",
+  accessToken: API_KEY
+});
+
+function createLine(feature, latlng) {
+  return L.polyLine(feature.geometry.coordinates);
+}
+
+const faultLines = L.geoJSON(faultLineData, {
+  pointToLayer: createLine
+});
+
   // Create our map, giving it the streetmap and earthquakes layers to display on load
   const myMap = L.map("map", {
-    center: [
-      37.09, -95.71
-    ],
-    zoom: 5,
-    layers: [streetmap, earthquakes]
+    center: [0, 0],
+    zoom: 3,
+    layers: [streetmap, earthquakes, faultLines]
   });
+
+  const baseMaps = {
+    Streets: streetmap,
+    Dark: dark,
+    Satellite: satellite
+  };
+
+  // Overlays that may be toggled on or off
+  const overlayMaps = {
+    Earthquakes: earthquakes,
+    "Fault Lines": faultLines
+  };
+
+  // Pass our map layers into our layer control
+  // Add the layer control to the map
+  L.control.layers(baseMaps, overlayMaps).addTo(myMap);
+
 //Create legend layer
 const legend = L.control({position: 'bottomright'});
 //Create and add legend
